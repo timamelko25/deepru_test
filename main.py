@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.exceptions import HTTPException
 import uvicorn
 
 from app.schemas import StatusResponse
@@ -20,7 +21,20 @@ async def healthcheck():
     )
 
 
+@app.exception_handler(Exception)
+async def custom_exception_handler(request, exc):
+    return HTTPException(
+        status_code=500,
+        content={"detail": "Internal server error"},
+    )
+
+
 app.include_router(router=router_pages)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=8001,
+        debug=False,
+    )
